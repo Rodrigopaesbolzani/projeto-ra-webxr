@@ -1,9 +1,12 @@
+# CÓDIGO PYTHON CORRIGIDO PARA EXECUTAR NO GOOGLE COLAB
 
+# Conteúdo HTML e JavaScript Completo com correção na lógica de interação
+html_content = """
 <!DOCTYPE html>
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Projeto RA - A-Frame/MindAR.js</title>
+  <title>Projeto RA - A-Frame/MindAR.js (CORRIGIDO)</title>
   
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
@@ -11,22 +14,12 @@
   <style>
     body { margin: 0; overflow: hidden; }
     #tap-to-interact {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 10px 20px;
-      background-color: rgba(0, 0, 0, 0.8);
-      color: white;
-      border-radius: 5px;
-      font-family: sans-serif;
-      font-weight: bold;
-      z-index: 9999;
-      cursor: pointer;
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      padding: 10px 20px; background-color: rgba(0, 0, 0, 0.8);
+      color: white; border-radius: 5px; font-family: sans-serif;
+      font-weight: bold; z-index: 9999; cursor: pointer;
     }
-    a-gltf-model {
-        visibility: hidden;
-    }
+    a-gltf-model { visibility: hidden; }
   </style>
 
   <script>
@@ -35,18 +28,15 @@
         const modelEl = this.el;
         let isLarge = false;
 
-        // Torna o modelo visível após o carregamento
         modelEl.addEventListener('model-loaded', function () {
             modelEl.setAttribute('visible', true);
             modelEl.style.visibility = 'visible';
         });
         
-        // Listener para o evento de clique/toque
         modelEl.addEventListener('click', function () {
-          // Lógica de Interatividade (muda escala e cor/emissão)
           if (isLarge) {
-            // Volta ao estado normal
-            modelEl.setAttribute('animation', {
+            // VOLTA AO ESTADO NORMAL: Volta a escala e REINICIA a rotação
+            modelEl.setAttribute('animation', { 
                 property: 'scale',
                 to: '0.1 0.1 0.1',
                 dur: 500,
@@ -54,15 +44,28 @@
             });
             modelEl.setAttribute('material', 'emissive: #000000; emissiveIntensity: 0;');
             
+            // REINICIA A ANIMAÇÃO DE ROTAÇÃO AUTOMÁTICA
+            modelEl.setAttribute('animation__auto', { 
+                property: 'rotation', 
+                to: '0 360 0', 
+                loop: true, 
+                dur: 5000, 
+                dir: 'normal', 
+                easing: 'linear' 
+            });
+            
           } else {
-            // Ativa o estado interativo: Aumenta e adiciona brilho verde
-            modelEl.setAttribute('animation', {
+            // ENTRA NO ESTADO INTERATIVO: Aumenta, brilha e PARA a rotação
+            modelEl.setAttribute('animation', { 
                 property: 'scale',
                 to: '0.15 0.15 0.15',
                 dur: 500,
                 easing: 'easeInOutQuad'
             });
             modelEl.setAttribute('material', 'emissive: #00ff00; emissiveIntensity: 0.5;');
+            
+            // REMOVE/PARA A ANIMAÇÃO DE ROTAÇÃO AUTOMÁTICA
+            modelEl.removeAttribute('animation__auto'); 
           }
           isLarge = !isLarge;
         });
@@ -91,7 +94,6 @@
     <a-camera mindar-image-camera=""></a-camera>
 
     <a-entity mindar-image-target="targetIndex: 0">
-      
       <a-gltf-model 
         id="animatedModel"
         src="#avatarModel" 
@@ -109,3 +111,9 @@
   </a-scene>
 </body>
 </html>
+"""
+
+with open('index.html', 'w') as f:
+    f.write(html_content)
+
+print("✅ Arquivo 'index.html' CORRIGIDO e criado com sucesso. Por favor, baixe e suba para o GitHub.")
