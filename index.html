@@ -98,7 +98,7 @@
     
     <!-- Assets -->
     <a-assets>
-      <img id="logoTexture" src="https://raw.githubusercontent.com/Rodrigopaesbolzani/projeto-ra-webxr/main/logo_eep.png" crossorigin="anonymous">
+      <img id="logoTexture" src="https://raw.githubusercontent.com/Rodrigopaesbolzani/projeto-ra-webxr/main/Logo%20EEP.jpg" crossorigin="anonymous">
     </a-assets>
     
     <!-- Câmera -->
@@ -107,29 +107,29 @@
     <!-- Entidade com marcador -->
     <a-entity mindar-image-target="targetIndex: 0" id="target">
       
-      <!-- Logo EEP como plano 3D com fundo transparente -->
+      <!-- Logo EEP como plano 3D -->
       <a-plane
         id="logoPlane"
         src="#logoTexture"
-        position="0 0 0.01"
+        position="0 0 0.05"
         rotation="0 0 0"
         scale="0.8 0.8 0.8"
         material="transparent: true; opacity: 1; shader: flat;"
         visible="true"
       ></a-plane>
       
-      <!-- Círculo de fundo (opcional, para dar profundidade) -->
+      <!-- Círculo de fundo para dar profundidade -->
       <a-circle
         id="bgCircle"
         position="0 0 0"
         rotation="0 0 0"
-        radius="0.45"
+        radius="0.5"
         color="#ffffff"
         material="opacity: 0.9;"
       ></a-circle>
       
       <!-- Iluminação -->
-      <a-light type="ambient" intensity="1.2" color="#ffffff"></a-light>
+      <a-light type="ambient" intensity="1.5" color="#ffffff"></a-light>
       <a-light type="directional" intensity="0.8" position="1 1 1" color="#ffffff"></a-light>
     </a-entity>
   </a-scene>
@@ -150,20 +150,23 @@
         scale: '1.2 1.2 1.2',
         rotation: '0 0 360',
         bgColor: '#2856a3',
+        bgOpacity: '0.95',
         message: '🔵 Logo Azul Grande',
         buttonBg: 'linear-gradient(135deg, #2856a3 0%, #1a3d7a 100%)'
       },
       { 
-        scale: '0.6 0.6 0.6',
+        scale: '0.5 0.5 0.5',
         rotation: '0 0 -360',
         bgColor: '#f39c12',
+        bgOpacity: '0.95',
         message: '🟡 Logo Amarelo Pequeno',
         buttonBg: 'linear-gradient(135deg, #f39c12 0%, #e67e22 100%)'
       },
       { 
-        scale: '1.5 1.5 1.5',
+        scale: '1.6 1.6 1.6',
         rotation: '0 0 720',
         bgColor: '#27ae60',
+        bgOpacity: '0.95',
         message: '🟢 Logo Verde Gigante',
         buttonBg: 'linear-gradient(135deg, #27ae60 0%, #229954 100%)'
       },
@@ -171,6 +174,7 @@
         scale: '0.8 0.8 0.8',
         rotation: '0 0 0',
         bgColor: '#ffffff',
+        bgOpacity: '0.9',
         message: '⚪ Logo Original',
         buttonBg: 'linear-gradient(135deg, #2856a3 0%, #1a3d7a 100%)'
       }
@@ -231,6 +235,14 @@
       bgCircle.setAttribute('animation__color', {
         property: 'color',
         to: effect.bgColor,
+        dur: 600,
+        easing: 'linear'
+      });
+
+      // Muda opacidade
+      bgCircle.setAttribute('animation__opacity', {
+        property: 'material.opacity',
+        to: effect.bgOpacity,
         dur: 600,
         easing: 'linear'
       });
