@@ -1,12 +1,8 @@
-# CÓDIGO PYTHON FINAL E COMPLETO - COM INTERATIVIDADE CORRIGIDA (Toque Para/Inicia Rotação)
-
-# Conteúdo HTML e JavaScript Completo com correção na lógica de interação
-html_content = """
 <!DOCTYPE html>
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Projeto RA - A-Frame/MindAR.js (FINAL)</title>
+  <title>Projeto RA - A-Frame/MindAR.js</title>
   
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
@@ -26,48 +22,37 @@ html_content = """
     AFRAME.registerComponent('interact-on-click', {
       init: function () {
         const modelEl = this.el;
-        let isLarge = false;
-
+        let isInteracting = false;
+        
         modelEl.addEventListener('model-loaded', function () {
             modelEl.setAttribute('visible', true);
             modelEl.style.visibility = 'visible';
         });
         
         modelEl.addEventListener('click', function () {
-          if (isLarge) {
-            // VOLTA AO ESTADO NORMAL: Volta a escala e REINICIA a rotação
+          if (isInteracting) {
             modelEl.setAttribute('animation', { 
                 property: 'scale',
-                to: '0.1 0.1 0.1',
+                to: '0.08 0.08 0.08',
                 dur: 500,
                 easing: 'easeInOutQuad'
             });
             modelEl.setAttribute('material', 'emissive: #000000; emissiveIntensity: 0;');
             
-            // REINICIA A ANIMAÇÃO DE ROTAÇÃO AUTOMÁTICA
-            modelEl.setAttribute('animation__auto', { 
-                property: 'rotation', 
-                to: '0 360 0', 
-                loop: true, 
-                dur: 5000, 
-                dir: 'normal', 
-                easing: 'linear' 
-            });
+            modelEl.setAttribute('animation__auto', 'property: rotation; to: 0 360 0; loop: true; dur: 5000; dir: normal; easing: linear;');
             
           } else {
-            // ENTRA NO ESTADO INTERATIVO: Aumenta, brilha e PARA a rotação
             modelEl.setAttribute('animation', { 
                 property: 'scale',
-                to: '0.15 0.15 0.15',
+                to: '0.12 0.12 0.12',
                 dur: 500,
                 easing: 'easeInOutQuad'
             });
             modelEl.setAttribute('material', 'emissive: #00ff00; emissiveIntensity: 0.5;');
             
-            // REMOVE/PARA A ANIMAÇÃO DE ROTAÇÃO AUTOMÁTICA
-            modelEl.removeAttribute('animation__auto'); 
+            modelEl.setAttribute('animation__auto', 'property: rotation; to: 0 0 0; dur: 1; loop: false;'); 
           }
-          isLarge = !isLarge;
+          isInteracting = !isInteracting;
         });
       }
     });
@@ -98,8 +83,8 @@ html_content = """
         id="animatedModel"
         src="#avatarModel" 
         rotation="0 0 0" 
-        position="0 0 0.1" 
-        scale="0.1 0.1 0.1" 
+        position="0 0 0.05"
+        scale="0.08 0.08 0.08"
         
         animation__auto="property: rotation; to: 0 360 0; loop: true; dur: 5000; dir: normal; easing: linear;"
         
@@ -111,9 +96,3 @@ html_content = """
   </a-scene>
 </body>
 </html>
-"""
-
-with open('index.html', 'w') as f:
-    f.write(html_content)
-
-print("✅ Arquivo 'index.html' FINALIZADO com interatividade corrigida. Por favor, baixe-o e substitua o arquivo no seu repositório do GitHub.")
