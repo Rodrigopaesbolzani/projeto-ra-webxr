@@ -94,25 +94,25 @@
             const effects = [
               { 
                 color: '#ff0000', 
-                scale: '0.25 0.25 0.25',
+                scale: '0.08 0.08 0.08',
                 rotation: '0 360 0',
                 message: '🔴 Modo Vermelho'
               },
               { 
                 color: '#00ff00', 
-                scale: '0.20 0.20 0.20',
+                scale: '0.04 0.04 0.04',
                 rotation: '0 -360 0',
                 message: '🟢 Modo Verde'
               },
               { 
                 color: '#0000ff', 
-                scale: '0.30 0.30 0.30',
+                scale: '0.10 0.10 0.10',
                 rotation: '360 0 0',
                 message: '🔵 Modo Azul'
               },
               { 
                 color: '#ffffff', 
-                scale: '0.18 0.18 0.18',
+                scale: '0.05 0.05 0.05',
                 rotation: '0 0 0',
                 message: '⚪ Modo Original'
               }
@@ -226,16 +226,17 @@
       <a-gltf-model 
         id="model3d"
         src="#avatarModel" 
-        position="0 0 0"
+        position="0 0 0.1"
         rotation="0 0 0"
-        scale="0.18 0.18 0.18"
+        scale="0.05 0.05 0.05"
         click-interaction
         animation-mixer="clip: *"
-        material="emissive: #ffffff; emissiveIntensity: 0.3;"
       ></a-gltf-model>
       
-      <!-- Luz adicional para melhor visualização -->
-      <a-light type="point" intensity="0.8" distance="3" color="#ffffff" position="0 0.5 0"></a-light>
+      <!-- Iluminação ambiente forte -->
+      <a-light type="ambient" intensity="1.5" color="#ffffff"></a-light>
+      <a-light type="directional" intensity="1.0" position="1 1 1" color="#ffffff"></a-light>
+      <a-light type="point" intensity="0.8" distance="2" color="#ffffff" position="0 0.3 0.5"></a-light>
     </a-entity>
   </a-scene>
 </body>
