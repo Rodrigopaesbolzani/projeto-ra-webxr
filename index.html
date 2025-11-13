@@ -72,6 +72,7 @@
         const statusDiv = document.getElementById('status');
         let isAnimating = false;
         let clickCount = 0;
+        const self = this;
         
         // Aguarda o modelo carregar
         model.addEventListener('model-loaded', () => {
@@ -81,10 +82,29 @@
           setTimeout(() => {
             statusDiv.style.display = 'none';
           }, 2000);
+          
+          // Habilita cursor e raycaster após carregar
+          model.setAttribute('visible', true);
+          self.setupInteraction();
         });
         
-        // Interação por clique/toque
-        model.addEventListener('click', () => {
+        this.setupInteraction = function() {
+          // Remove listeners antigos
+          model.removeEventListener('click', self.handleClick);
+          model.removeEventListener('touchstart', self.handleClick);
+          
+          // Adiciona novos listeners
+          model.addEventListener('click', self.handleClick);
+          model.addEventListener('touchstart', self.handleClick);
+          
+          console.log('Interação configurada!');
+        };
+        
+        this.handleClick = function(evt) {
+          evt.stopPropagation();
+          evt.preventDefault();
+          
+          console.log('Clique detectado!');
           clickCount++;
           
           if (!isAnimating) {
@@ -111,14 +131,16 @@
                 message: '🔵 Modo Azul'
               },
               { 
-                color: '#ffffff', 
+                color: '#ffff00', 
                 scale: '0.05 0.05 0.05',
                 rotation: '0 0 0',
-                message: '⚪ Modo Original'
+                message: '🟡 Modo Amarelo'
               }
             ];
             
             const effect = effects[clickCount % effects.length];
+            
+            console.log('Aplicando efeito:', effect.message);
             
             // Aplica animação de escala
             model.setAttribute('animation__scale', {
@@ -136,11 +158,17 @@
               easing: 'easeInOutQuad'
             });
             
-            // Muda cor emissiva
-            model.setAttribute('material', {
-              emissive: effect.color,
-              emissiveIntensity: 0.6
-            });
+            // Muda cor emissiva (funciona com luzes)
+            const mesh = model.getObject3D('mesh');
+            if (mesh) {
+              mesh.traverse((node) => {
+                if (node.isMesh && node.material) {
+                  node.material.emissive = new THREE.Color(effect.color);
+                  node.material.emissiveIntensity = 0.8;
+                  node.material.needsUpdate = true;
+                }
+              });
+            }
             
             // Feedback visual
             statusDiv.textContent = effect.message;
@@ -153,7 +181,7 @@
               statusDiv.classList.remove('detected');
             }, 1000);
           }
-        });
+        };
       }
     });
     
@@ -217,8 +245,13 @@
       </a-asset-item>
     </a-assets>
     
-    <!-- Câmera -->
-    <a-camera mindar-image-camera=""></a-camera>
+    <!-- Câmera com cursor para cliques -->
+    <a-camera mindar-image-camera="">
+      <a-cursor
+        fuse="false"
+        raycaster="objects: .clickable"
+      ></a-cursor>
+    </a-camera>
     
     <!-- Entidade com marcador -->
     <a-entity mindar-image-target="targetIndex: 0" target-tracker>
@@ -226,11 +259,12 @@
       <a-gltf-model 
         id="model3d"
         src="#avatarModel" 
-        position="0 0 0.1"
+        position="0 -0.15 0.1"
         rotation="0 0 0"
         scale="0.05 0.05 0.05"
         click-interaction
         animation-mixer="clip: *"
+        class="clickable"
       ></a-gltf-model>
       
       <!-- Iluminação ambiente forte -->
