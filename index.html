@@ -3,7 +3,7 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta charset="UTF-8">
-  <title>Projeto RA - Marcador Natural</title>
+  <title>Projeto RA - Logo EEP</title>
   
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
@@ -36,7 +36,7 @@
       bottom: 30px;
       left: 50%;
       transform: translateX(-50%);
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #2856a3 0%, #1a3d7a 100%);
       color: white;
       padding: 18px 40px;
       border-radius: 50px;
@@ -64,7 +64,7 @@
       top: 80px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(76, 175, 80, 0.95);
+      background: rgba(40, 86, 163, 0.95);
       color: white;
       padding: 10px 20px;
       border-radius: 20px;
@@ -79,11 +79,11 @@
 <body>
   <!-- Instruções na tela -->
   <div id="instructions">
-    📱 Aponte para o marcador e toque no botão
+    📱 Aponte para o logo EEP e toque no botão
   </div>
   
   <!-- Botão de interação -->
-  <button id="interact-button">🎨 MUDAR COR</button>
+  <button id="interact-button">✨ ANIMAR LOGO</button>
   
   <!-- Status de detecção -->
   <div id="status"></div>
@@ -98,10 +98,7 @@
     
     <!-- Assets -->
     <a-assets>
-      <a-asset-item 
-        id="avatarModel" 
-        src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/softmind/scene.gltf">
-      </a-asset-item>
+      <img id="logoTexture" src="https://raw.githubusercontent.com/Rodrigopaesbolzani/projeto-ra-webxr/main/logo_eep.png" crossorigin="anonymous">
     </a-assets>
     
     <!-- Câmera -->
@@ -109,86 +106,90 @@
     
     <!-- Entidade com marcador -->
     <a-entity mindar-image-target="targetIndex: 0" id="target">
-      <!-- Modelo 3D -->
-      <a-gltf-model 
-        id="model3d"
-        src="#avatarModel" 
-        position="0 -0.15 0.1"
-        rotation="0 0 0"
-        scale="0.05 0.05 0.05"
-        animation-mixer="clip: *"
-      ></a-gltf-model>
       
-      <!-- Iluminação ambiente forte -->
-      <a-light type="ambient" intensity="1.5" color="#ffffff"></a-light>
-      <a-light type="directional" intensity="1.0" position="1 1 1" color="#ffffff"></a-light>
-      <a-light type="point" intensity="0.8" distance="2" color="#ffffff" position="0 0.3 0.5"></a-light>
+      <!-- Logo EEP como plano 3D com fundo transparente -->
+      <a-plane
+        id="logoPlane"
+        src="#logoTexture"
+        position="0 0 0.01"
+        rotation="0 0 0"
+        scale="0.8 0.8 0.8"
+        material="transparent: true; opacity: 1; shader: flat;"
+        visible="true"
+      ></a-plane>
+      
+      <!-- Círculo de fundo (opcional, para dar profundidade) -->
+      <a-circle
+        id="bgCircle"
+        position="0 0 0"
+        rotation="0 0 0"
+        radius="0.45"
+        color="#ffffff"
+        material="opacity: 0.9;"
+      ></a-circle>
+      
+      <!-- Iluminação -->
+      <a-light type="ambient" intensity="1.2" color="#ffffff"></a-light>
+      <a-light type="directional" intensity="0.8" position="1 1 1" color="#ffffff"></a-light>
     </a-entity>
   </a-scene>
 
   <script>
     // Variáveis globais
     let clickCount = 0;
-    let modelLoaded = false;
     let targetVisible = false;
     const interactButton = document.getElementById('interact-button');
     const statusDiv = document.getElementById('status');
-    const model = document.querySelector('#model3d');
+    const logoPlane = document.querySelector('#logoPlane');
+    const bgCircle = document.querySelector('#bgCircle');
     const target = document.querySelector('#target');
 
     // Efeitos de interação
     const effects = [
       { 
-        color: '#ff0000', 
-        scale: '0.08 0.08 0.08',
-        rotation: '0 0 0',
-        message: '🔴 Vermelho Grande',
-        button: 'linear-gradient(135deg, #f93a3a 0%, #c20000 100%)'
+        scale: '1.2 1.2 1.2',
+        rotation: '0 0 360',
+        bgColor: '#2856a3',
+        message: '🔵 Logo Azul Grande',
+        buttonBg: 'linear-gradient(135deg, #2856a3 0%, #1a3d7a 100%)'
       },
       { 
-        color: '#00ff00', 
-        scale: '0.03 0.03 0.03',
-        rotation: '0 0 0',
-        message: '🟢 Verde Pequeno',
-        button: 'linear-gradient(135deg, #3af93a 0%, #00c200 100%)'
+        scale: '0.6 0.6 0.6',
+        rotation: '0 0 -360',
+        bgColor: '#f39c12',
+        message: '🟡 Logo Amarelo Pequeno',
+        buttonBg: 'linear-gradient(135deg, #f39c12 0%, #e67e22 100%)'
       },
       { 
-        color: '#0000ff', 
-        scale: '0.10 0.10 0.10',
-        rotation: '0 0 0',
-        message: '🔵 Azul Gigante',
-        button: 'linear-gradient(135deg, #3a3af9 0%, #0000c2 100%)'
+        scale: '1.5 1.5 1.5',
+        rotation: '0 0 720',
+        bgColor: '#27ae60',
+        message: '🟢 Logo Verde Gigante',
+        buttonBg: 'linear-gradient(135deg, #27ae60 0%, #229954 100%)'
       },
       { 
-        color: '#ffff00', 
-        scale: '0.05 0.05 0.05',
+        scale: '0.8 0.8 0.8',
         rotation: '0 0 0',
-        message: '🟡 Amarelo Normal',
-        button: 'linear-gradient(135deg, #f9f93a 0%, #c2c200 100%)'
+        bgColor: '#ffffff',
+        message: '⚪ Logo Original',
+        buttonBg: 'linear-gradient(135deg, #2856a3 0%, #1a3d7a 100%)'
       }
     ];
 
-    // Detecta quando o modelo carrega
-    model.addEventListener('model-loaded', function() {
-      console.log('✓ Modelo 3D carregado!');
-      modelLoaded = true;
-      showStatus('✓ Modelo carregado!', 2000);
-    });
-
     // Detecta quando o marcador aparece
     target.addEventListener('targetFound', function() {
-      console.log('✓ Marcador detectado!');
+      console.log('✓ Logo EEP detectado!');
       targetVisible = true;
       interactButton.style.display = 'block';
-      showStatus('✓ Marcador detectado!', 2000);
+      showStatus('✓ Logo EEP detectado!', 2000);
     });
 
     // Detecta quando o marcador some
     target.addEventListener('targetLost', function() {
-      console.log('✗ Marcador perdido!');
+      console.log('✗ Logo perdido!');
       targetVisible = false;
       interactButton.style.display = 'none';
-      showStatus('✗ Marcador perdido', 1500);
+      showStatus('✗ Logo perdido', 1500);
     });
 
     // Função para mostrar status
@@ -201,47 +202,41 @@
     }
 
     // Função de interação (chamada pelo botão)
-    function changeModelEffect() {
-      if (!modelLoaded || !targetVisible) {
-        console.log('Modelo não está visível ou não carregou');
+    function animateLogo() {
+      if (!targetVisible) {
+        console.log('Logo não está visível');
         return;
       }
 
       const effect = effects[clickCount % effects.length];
       console.log('Aplicando efeito:', effect.message);
 
-      // Animação de escala
-      model.setAttribute('animation__scale', {
+      // Animação de escala do logo
+      logoPlane.setAttribute('animation__scale', {
         property: 'scale',
         to: effect.scale,
-        dur: 600,
+        dur: 800,
         easing: 'easeInOutBack'
       });
 
       // Animação de rotação
-      model.setAttribute('animation__rotate', {
+      logoPlane.setAttribute('animation__rotate', {
         property: 'rotation',
         to: effect.rotation,
-        dur: 800,
+        dur: 1200,
         easing: 'easeInOutQuad'
       });
 
-      // Muda cor do material usando Three.js
-      setTimeout(() => {
-        const mesh = model.getObject3D('mesh');
-        if (mesh) {
-          mesh.traverse((node) => {
-            if (node.isMesh && node.material) {
-              node.material.emissive = new THREE.Color(effect.color);
-              node.material.emissiveIntensity = 0.9;
-              node.material.needsUpdate = true;
-            }
-          });
-        }
-      }, 100);
+      // Muda cor do círculo de fundo
+      bgCircle.setAttribute('animation__color', {
+        property: 'color',
+        to: effect.bgColor,
+        dur: 600,
+        easing: 'linear'
+      });
 
       // Muda cor do botão
-      interactButton.style.background = effect.button;
+      interactButton.style.background = effect.buttonBg;
 
       // Feedback visual
       showStatus(effect.message, 1500);
@@ -250,13 +245,13 @@
     }
 
     // Event listener do botão
-    interactButton.addEventListener('click', changeModelEffect);
+    interactButton.addEventListener('click', animateLogo);
     interactButton.addEventListener('touchstart', (e) => {
       e.preventDefault();
-      changeModelEffect();
+      animateLogo();
     });
 
-    console.log('🚀 Sistema iniciado!');
+    console.log('🚀 Sistema EEP iniciado!');
   </script>
 </body>
 </html>
