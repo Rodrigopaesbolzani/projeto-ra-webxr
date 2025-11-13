@@ -17,18 +17,18 @@
     
     #instructions {
       position: fixed;
-      top: 20px;
+      bottom: 120px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(0, 0, 0, 0.85);
+      background: rgba(0, 0, 0, 0.5);
       color: white;
-      padding: 12px 20px;
-      border-radius: 10px;
-      z-index: 9999;
+      padding: 8px 15px;
+      border-radius: 20px;
+      z-index: 9998;
       text-align: center;
-      max-width: 80%;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-      font-size: 14px;
+      max-width: 70%;
+      font-size: 11px;
+      opacity: 0.8;
     }
     
     #interact-button {
@@ -79,8 +79,7 @@
 <body>
   <!-- Instruções na tela -->
   <div id="instructions">
-    📱 Aponte a câmera para o marcador<br>
-    Toque no botão para interagir
+    📱 Aponte para o marcador e toque no botão
   </div>
   
   <!-- Botão de interação -->
@@ -142,21 +141,21 @@
       { 
         color: '#ff0000', 
         scale: '0.08 0.08 0.08',
-        rotation: '0 360 0',
+        rotation: '0 0 0',
         message: '🔴 Vermelho Grande',
         button: 'linear-gradient(135deg, #f93a3a 0%, #c20000 100%)'
       },
       { 
         color: '#00ff00', 
         scale: '0.03 0.03 0.03',
-        rotation: '0 -360 0',
+        rotation: '0 0 0',
         message: '🟢 Verde Pequeno',
         button: 'linear-gradient(135deg, #3af93a 0%, #00c200 100%)'
       },
       { 
         color: '#0000ff', 
         scale: '0.10 0.10 0.10',
-        rotation: '360 0 0',
+        rotation: '0 0 0',
         message: '🔵 Azul Gigante',
         button: 'linear-gradient(135deg, #3a3af9 0%, #0000c2 100%)'
       },
