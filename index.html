@@ -83,7 +83,7 @@
   </div>
   
   <!-- Botão de interação -->
-  <button id="interact-button">✨ ANIMAR LOGO</button>
+  <button id="interact-button">✨ MUDAR COR</button>
   
   <!-- Status de detecção -->
   <div id="status"></div>
@@ -107,17 +107,7 @@
     <!-- Entidade com marcador -->
     <a-entity mindar-image-target="targetIndex: 0" id="target">
       
-      <!-- Círculo de fundo para dar profundidade (atrás) -->
-      <a-circle
-        id="bgCircle"
-        position="0 0 0"
-        rotation="0 0 0"
-        radius="0.5"
-        color="#ffffff"
-        material="opacity: 0.9;"
-      ></a-circle>
-      
-      // Logo EEP como plano 3D (na frente) com opacidade ajustável
+      <!-- Logo EEP como plano 3D - SEM círculo atrás -->
       <a-plane
         id="logoPlane"
         src="#logoTexture"
@@ -141,40 +131,42 @@
     const interactButton = document.getElementById('interact-button');
     const statusDiv = document.getElementById('status');
     const logoPlane = document.querySelector('#logoPlane');
-    const bgCircle = document.querySelector('#bgCircle');
     const target = document.querySelector('#target');
 
-    // Efeitos de interação
+    // Efeitos de interação - FILTROS DE COR DIRETO NO LOGO
     const effects = [
       { 
         scale: '1.2 1.2 1.2',
         rotation: '0 0 360',
-        bgColor: '#e74c3c',
-        logoColor: '#ffcccc',
-        message: '🔴 Logo Vermelho Grande',
+        colorFilter: '#ff6666',  // Vermelho
+        message: '🔴 Logo Vermelho',
         buttonBg: 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)'
       },
       { 
         scale: '0.5 0.5 0.5',
         rotation: '0 0 -360',
-        bgColor: '#f39c12',
-        logoColor: '#fff4cc',
-        message: '🟡 Logo Amarelo Pequeno',
+        colorFilter: '#ffcc66',  // Laranja/Amarelo
+        message: '🟠 Logo Laranja',
         buttonBg: 'linear-gradient(135deg, #f39c12 0%, #e67e22 100%)'
       },
       { 
         scale: '1.6 1.6 1.6',
         rotation: '0 0 720',
-        bgColor: '#27ae60',
-        logoColor: '#ccffcc',
-        message: '🟢 Logo Verde Gigante',
+        colorFilter: '#66ff66',  // Verde
+        message: '🟢 Logo Verde',
         buttonBg: 'linear-gradient(135deg, #27ae60 0%, #229954 100%)'
+      },
+      { 
+        scale: '1.0 1.0 1.0',
+        rotation: '0 0 -720',
+        colorFilter: '#6666ff',  // Azul
+        message: '🔵 Logo Azul',
+        buttonBg: 'linear-gradient(135deg, #3498db 0%, #2980b9 100%)'
       },
       { 
         scale: '0.8 0.8 0.8',
         rotation: '0 0 0',
-        bgColor: '#ffffff',
-        logoColor: '#ffffff',
+        colorFilter: '#ffffff',  // Original
         message: '⚪ Logo Original',
         buttonBg: 'linear-gradient(135deg, #2856a3 0%, #1a3d7a 100%)'
       }
@@ -206,7 +198,7 @@
     }
 
     // Função de interação (chamada pelo botão)
-    function animateLogo() {
+    function changeLogoColor() {
       if (!targetVisible) {
         console.log('Logo não está visível');
         return;
@@ -231,24 +223,19 @@
         easing: 'easeInOutQuad'
       });
 
-      // Muda cor do círculo de fundo
-      bgCircle.setAttribute('animation__color', {
-        property: 'color',
-        to: effect.bgColor,
-        dur: 600,
-        easing: 'linear'
-      });
-
-      // Aplica filtro de cor no logo
-      logoPlane.setAttribute('animation__logocolor', {
+      // APLICA FILTRO DE COR DIRETO NO LOGO
+      logoPlane.setAttribute('animation__color', {
         property: 'material.color',
-        to: effect.logoColor,
+        to: effect.colorFilter,
         dur: 600,
         easing: 'linear'
       });
 
       // Muda cor do botão
       interactButton.style.background = effect.buttonBg;
+
+      // Atualiza status
+      statusDiv.style.background = effect.buttonBg.replace('linear-gradient(135deg, ', 'rgba(').replace(' 0%', '').split(',')[0] + ', 0.95)';
 
       // Feedback visual
       showStatus(effect.message, 1500);
@@ -257,10 +244,10 @@
     }
 
     // Event listener do botão
-    interactButton.addEventListener('click', animateLogo);
+    interactButton.addEventListener('click', changeLogoColor);
     interactButton.addEventListener('touchstart', (e) => {
       e.preventDefault();
-      animateLogo();
+      changeLogoColor();
     });
 
     console.log('🚀 Sistema EEP iniciado!');
