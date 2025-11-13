@@ -22,209 +22,69 @@
       transform: translateX(-50%);
       background: rgba(0, 0, 0, 0.85);
       color: white;
-      padding: 15px 25px;
+      padding: 12px 20px;
       border-radius: 10px;
       z-index: 9999;
       text-align: center;
       max-width: 80%;
       box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      font-size: 14px;
     }
     
-    #instructions h3 {
-      margin: 0 0 5px 0;
-      font-size: 16px;
+    #interact-button {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 18px 40px;
+      border-radius: 50px;
+      z-index: 9999;
+      font-weight: bold;
+      font-size: 18px;
+      border: 3px solid white;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+      cursor: pointer;
+      display: none;
+      animation: pulse 2s infinite;
     }
     
-    #instructions p {
-      margin: 5px 0;
-      font-size: 12px;
-      opacity: 0.9;
+    @keyframes pulse {
+      0%, 100% { transform: translateX(-50%) scale(1); }
+      50% { transform: translateX(-50%) scale(1.05); }
+    }
+    
+    #interact-button:active {
+      transform: translateX(-50%) scale(0.95);
     }
     
     #status {
       position: fixed;
-      bottom: 20px;
+      top: 80px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(76, 175, 80, 0.9);
+      background: rgba(76, 175, 80, 0.95);
       color: white;
       padding: 10px 20px;
       border-radius: 20px;
       z-index: 9999;
       font-weight: bold;
       display: none;
-    }
-    
-    .detected {
-      background: rgba(76, 175, 80, 0.9) !important;
-    }
-    
-    .lost {
-      background: rgba(244, 67, 54, 0.9) !important;
+      font-size: 16px;
     }
   </style>
-  
-  <script>
-    // Componente de interação melhorado
-    AFRAME.registerComponent('click-interaction', {
-      init: function () {
-        const model = this.el;
-        const statusDiv = document.getElementById('status');
-        let isAnimating = false;
-        let clickCount = 0;
-        const self = this;
-        
-        // Aguarda o modelo carregar
-        model.addEventListener('model-loaded', () => {
-          console.log('Modelo carregado com sucesso!');
-          statusDiv.textContent = '✓ Modelo carregado';
-          statusDiv.style.display = 'block';
-          setTimeout(() => {
-            statusDiv.style.display = 'none';
-          }, 2000);
-          
-          // Habilita cursor e raycaster após carregar
-          model.setAttribute('visible', true);
-          self.setupInteraction();
-        });
-        
-        this.setupInteraction = function() {
-          // Remove listeners antigos
-          model.removeEventListener('click', self.handleClick);
-          model.removeEventListener('touchstart', self.handleClick);
-          
-          // Adiciona novos listeners
-          model.addEventListener('click', self.handleClick);
-          model.addEventListener('touchstart', self.handleClick);
-          
-          console.log('Interação configurada!');
-        };
-        
-        this.handleClick = function(evt) {
-          evt.stopPropagation();
-          evt.preventDefault();
-          
-          console.log('Clique detectado!');
-          clickCount++;
-          
-          if (!isAnimating) {
-            isAnimating = true;
-            
-            // Efeito visual baseado no número de cliques
-            const effects = [
-              { 
-                color: '#ff0000', 
-                scale: '0.08 0.08 0.08',
-                rotation: '0 360 0',
-                message: '🔴 Modo Vermelho'
-              },
-              { 
-                color: '#00ff00', 
-                scale: '0.04 0.04 0.04',
-                rotation: '0 -360 0',
-                message: '🟢 Modo Verde'
-              },
-              { 
-                color: '#0000ff', 
-                scale: '0.10 0.10 0.10',
-                rotation: '360 0 0',
-                message: '🔵 Modo Azul'
-              },
-              { 
-                color: '#ffff00', 
-                scale: '0.05 0.05 0.05',
-                rotation: '0 0 0',
-                message: '🟡 Modo Amarelo'
-              }
-            ];
-            
-            const effect = effects[clickCount % effects.length];
-            
-            console.log('Aplicando efeito:', effect.message);
-            
-            // Aplica animação de escala
-            model.setAttribute('animation__scale', {
-              property: 'scale',
-              to: effect.scale,
-              dur: 600,
-              easing: 'easeInOutBack'
-            });
-            
-            // Aplica rotação
-            model.setAttribute('animation__rotate', {
-              property: 'rotation',
-              to: effect.rotation,
-              dur: 800,
-              easing: 'easeInOutQuad'
-            });
-            
-            // Muda cor emissiva (funciona com luzes)
-            const mesh = model.getObject3D('mesh');
-            if (mesh) {
-              mesh.traverse((node) => {
-                if (node.isMesh && node.material) {
-                  node.material.emissive = new THREE.Color(effect.color);
-                  node.material.emissiveIntensity = 0.8;
-                  node.material.needsUpdate = true;
-                }
-              });
-            }
-            
-            // Feedback visual
-            statusDiv.textContent = effect.message;
-            statusDiv.style.display = 'block';
-            statusDiv.classList.add('detected');
-            
-            setTimeout(() => {
-              isAnimating = false;
-              statusDiv.style.display = 'none';
-              statusDiv.classList.remove('detected');
-            }, 1000);
-          }
-        };
-      }
-    });
-    
-    // Componente para detectar quando o marcador é encontrado/perdido
-    AFRAME.registerComponent('target-tracker', {
-      init: function() {
-        const statusDiv = document.getElementById('status');
-        
-        this.el.addEventListener('targetFound', () => {
-          console.log('Marcador detectado!');
-          statusDiv.textContent = '✓ Marcador detectado';
-          statusDiv.style.display = 'block';
-          statusDiv.classList.add('detected');
-          statusDiv.classList.remove('lost');
-          
-          setTimeout(() => {
-            statusDiv.style.display = 'none';
-          }, 2000);
-        });
-        
-        this.el.addEventListener('targetLost', () => {
-          console.log('Marcador perdido!');
-          statusDiv.textContent = '✗ Marcador perdido';
-          statusDiv.classList.add('lost');
-          statusDiv.classList.remove('detected');
-          statusDiv.style.display = 'block';
-          
-          setTimeout(() => {
-            statusDiv.style.display = 'none';
-          }, 2000);
-        });
-      }
-    });
-  </script>
 </head>
 
 <body>
   <!-- Instruções na tela -->
   <div id="instructions">
-    <h3>📱 Projeto de Realidade Aumentada</h3>
-    <p>Aponte a câmera para o marcador</p>
-    <p>Toque no objeto 3D para mudar cor e tamanho</p>
+    📱 Aponte a câmera para o marcador<br>
+    Toque no botão para interagir
   </div>
+  
+  <!-- Botão de interação -->
+  <button id="interact-button">🎨 MUDAR COR</button>
   
   <!-- Status de detecção -->
   <div id="status"></div>
@@ -245,16 +105,11 @@
       </a-asset-item>
     </a-assets>
     
-    <!-- Câmera com cursor para cliques -->
-    <a-camera mindar-image-camera="">
-      <a-cursor
-        fuse="false"
-        raycaster="objects: .clickable"
-      ></a-cursor>
-    </a-camera>
+    <!-- Câmera -->
+    <a-camera mindar-image-camera=""></a-camera>
     
     <!-- Entidade com marcador -->
-    <a-entity mindar-image-target="targetIndex: 0" target-tracker>
+    <a-entity mindar-image-target="targetIndex: 0" id="target">
       <!-- Modelo 3D -->
       <a-gltf-model 
         id="model3d"
@@ -262,9 +117,7 @@
         position="0 -0.15 0.1"
         rotation="0 0 0"
         scale="0.05 0.05 0.05"
-        click-interaction
         animation-mixer="clip: *"
-        class="clickable"
       ></a-gltf-model>
       
       <!-- Iluminação ambiente forte -->
@@ -273,5 +126,138 @@
       <a-light type="point" intensity="0.8" distance="2" color="#ffffff" position="0 0.3 0.5"></a-light>
     </a-entity>
   </a-scene>
+
+  <script>
+    // Variáveis globais
+    let clickCount = 0;
+    let modelLoaded = false;
+    let targetVisible = false;
+    const interactButton = document.getElementById('interact-button');
+    const statusDiv = document.getElementById('status');
+    const model = document.querySelector('#model3d');
+    const target = document.querySelector('#target');
+
+    // Efeitos de interação
+    const effects = [
+      { 
+        color: '#ff0000', 
+        scale: '0.08 0.08 0.08',
+        rotation: '0 360 0',
+        message: '🔴 Vermelho Grande',
+        button: 'linear-gradient(135deg, #f93a3a 0%, #c20000 100%)'
+      },
+      { 
+        color: '#00ff00', 
+        scale: '0.03 0.03 0.03',
+        rotation: '0 -360 0',
+        message: '🟢 Verde Pequeno',
+        button: 'linear-gradient(135deg, #3af93a 0%, #00c200 100%)'
+      },
+      { 
+        color: '#0000ff', 
+        scale: '0.10 0.10 0.10',
+        rotation: '360 0 0',
+        message: '🔵 Azul Gigante',
+        button: 'linear-gradient(135deg, #3a3af9 0%, #0000c2 100%)'
+      },
+      { 
+        color: '#ffff00', 
+        scale: '0.05 0.05 0.05',
+        rotation: '0 0 0',
+        message: '🟡 Amarelo Normal',
+        button: 'linear-gradient(135deg, #f9f93a 0%, #c2c200 100%)'
+      }
+    ];
+
+    // Detecta quando o modelo carrega
+    model.addEventListener('model-loaded', function() {
+      console.log('✓ Modelo 3D carregado!');
+      modelLoaded = true;
+      showStatus('✓ Modelo carregado!', 2000);
+    });
+
+    // Detecta quando o marcador aparece
+    target.addEventListener('targetFound', function() {
+      console.log('✓ Marcador detectado!');
+      targetVisible = true;
+      interactButton.style.display = 'block';
+      showStatus('✓ Marcador detectado!', 2000);
+    });
+
+    // Detecta quando o marcador some
+    target.addEventListener('targetLost', function() {
+      console.log('✗ Marcador perdido!');
+      targetVisible = false;
+      interactButton.style.display = 'none';
+      showStatus('✗ Marcador perdido', 1500);
+    });
+
+    // Função para mostrar status
+    function showStatus(message, duration) {
+      statusDiv.textContent = message;
+      statusDiv.style.display = 'block';
+      setTimeout(() => {
+        statusDiv.style.display = 'none';
+      }, duration);
+    }
+
+    // Função de interação (chamada pelo botão)
+    function changeModelEffect() {
+      if (!modelLoaded || !targetVisible) {
+        console.log('Modelo não está visível ou não carregou');
+        return;
+      }
+
+      const effect = effects[clickCount % effects.length];
+      console.log('Aplicando efeito:', effect.message);
+
+      // Animação de escala
+      model.setAttribute('animation__scale', {
+        property: 'scale',
+        to: effect.scale,
+        dur: 600,
+        easing: 'easeInOutBack'
+      });
+
+      // Animação de rotação
+      model.setAttribute('animation__rotate', {
+        property: 'rotation',
+        to: effect.rotation,
+        dur: 800,
+        easing: 'easeInOutQuad'
+      });
+
+      // Muda cor do material usando Three.js
+      setTimeout(() => {
+        const mesh = model.getObject3D('mesh');
+        if (mesh) {
+          mesh.traverse((node) => {
+            if (node.isMesh && node.material) {
+              node.material.emissive = new THREE.Color(effect.color);
+              node.material.emissiveIntensity = 0.9;
+              node.material.needsUpdate = true;
+            }
+          });
+        }
+      }, 100);
+
+      // Muda cor do botão
+      interactButton.style.background = effect.button;
+
+      // Feedback visual
+      showStatus(effect.message, 1500);
+
+      clickCount++;
+    }
+
+    // Event listener do botão
+    interactButton.addEventListener('click', changeModelEffect);
+    interactButton.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      changeModelEffect();
+    });
+
+    console.log('🚀 Sistema iniciado!');
+  </script>
 </body>
 </html>
