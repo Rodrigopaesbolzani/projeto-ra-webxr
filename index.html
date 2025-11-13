@@ -2,57 +2,188 @@
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Projeto RA - A-Frame/MindAR.js</title>
+  <meta charset="UTF-8">
+  <title>Projeto RA - Marcador Natural</title>
   
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-
+  
   <style>
-    body { margin: 0; overflow: hidden; }
-    #tap-to-interact {
-      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-      padding: 10px 20px; background-color: rgba(0, 0, 0, 0.8);
-      color: white; border-radius: 5px; font-family: sans-serif;
-      font-weight: bold; z-index: 9999; cursor: pointer;
+    body { 
+      margin: 0; 
+      overflow: hidden; 
+      font-family: 'Arial', sans-serif;
     }
-    a-gltf-model { visibility: hidden; }
+    
+    #instructions {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.85);
+      color: white;
+      padding: 15px 25px;
+      border-radius: 10px;
+      z-index: 9999;
+      text-align: center;
+      max-width: 80%;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    }
+    
+    #instructions h3 {
+      margin: 0 0 5px 0;
+      font-size: 16px;
+    }
+    
+    #instructions p {
+      margin: 5px 0;
+      font-size: 12px;
+      opacity: 0.9;
+    }
+    
+    #status {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(76, 175, 80, 0.9);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 20px;
+      z-index: 9999;
+      font-weight: bold;
+      display: none;
+    }
+    
+    .detected {
+      background: rgba(76, 175, 80, 0.9) !important;
+    }
+    
+    .lost {
+      background: rgba(244, 67, 54, 0.9) !important;
+    }
   </style>
-
+  
   <script>
-    AFRAME.registerComponent('interact-on-click', {
+    // Componente de interação melhorado
+    AFRAME.registerComponent('click-interaction', {
       init: function () {
-        const modelEl = this.el;
-        let isInteracting = false;
+        const model = this.el;
+        const statusDiv = document.getElementById('status');
+        let isAnimating = false;
+        let clickCount = 0;
         
-        modelEl.addEventListener('model-loaded', function () {
-            modelEl.setAttribute('visible', true);
-            modelEl.style.visibility = 'visible';
+        // Aguarda o modelo carregar
+        model.addEventListener('model-loaded', () => {
+          console.log('Modelo carregado com sucesso!');
+          statusDiv.textContent = '✓ Modelo carregado';
+          statusDiv.style.display = 'block';
+          setTimeout(() => {
+            statusDiv.style.display = 'none';
+          }, 2000);
         });
         
-        modelEl.addEventListener('click', function () {
-          if (isInteracting) {
-            modelEl.setAttribute('animation', { 
-                property: 'scale',
-                to: '0.08 0.08 0.08',
-                dur: 500,
-                easing: 'easeInOutQuad'
+        // Interação por clique/toque
+        model.addEventListener('click', () => {
+          clickCount++;
+          
+          if (!isAnimating) {
+            isAnimating = true;
+            
+            // Efeito visual baseado no número de cliques
+            const effects = [
+              { 
+                color: '#ff0000', 
+                scale: '0.25 0.25 0.25',
+                rotation: '0 360 0',
+                message: '🔴 Modo Vermelho'
+              },
+              { 
+                color: '#00ff00', 
+                scale: '0.20 0.20 0.20',
+                rotation: '0 -360 0',
+                message: '🟢 Modo Verde'
+              },
+              { 
+                color: '#0000ff', 
+                scale: '0.30 0.30 0.30',
+                rotation: '360 0 0',
+                message: '🔵 Modo Azul'
+              },
+              { 
+                color: '#ffffff', 
+                scale: '0.18 0.18 0.18',
+                rotation: '0 0 0',
+                message: '⚪ Modo Original'
+              }
+            ];
+            
+            const effect = effects[clickCount % effects.length];
+            
+            // Aplica animação de escala
+            model.setAttribute('animation__scale', {
+              property: 'scale',
+              to: effect.scale,
+              dur: 600,
+              easing: 'easeInOutBack'
             });
-            modelEl.setAttribute('material', 'emissive: #000000; emissiveIntensity: 0;');
             
-            modelEl.setAttribute('animation__auto', 'property: rotation; to: 0 360 0; loop: true; dur: 5000; dir: normal; easing: linear;');
-            
-          } else {
-            modelEl.setAttribute('animation', { 
-                property: 'scale',
-                to: '0.12 0.12 0.12',
-                dur: 500,
-                easing: 'easeInOutQuad'
+            // Aplica rotação
+            model.setAttribute('animation__rotate', {
+              property: 'rotation',
+              to: effect.rotation,
+              dur: 800,
+              easing: 'easeInOutQuad'
             });
-            modelEl.setAttribute('material', 'emissive: #00ff00; emissiveIntensity: 0.5;');
             
-            modelEl.setAttribute('animation__auto', 'property: rotation; to: 0 0 0; dur: 1; loop: false;'); 
+            // Muda cor emissiva
+            model.setAttribute('material', {
+              emissive: effect.color,
+              emissiveIntensity: 0.6
+            });
+            
+            // Feedback visual
+            statusDiv.textContent = effect.message;
+            statusDiv.style.display = 'block';
+            statusDiv.classList.add('detected');
+            
+            setTimeout(() => {
+              isAnimating = false;
+              statusDiv.style.display = 'none';
+              statusDiv.classList.remove('detected');
+            }, 1000);
           }
-          isInteracting = !isInteracting;
+        });
+      }
+    });
+    
+    // Componente para detectar quando o marcador é encontrado/perdido
+    AFRAME.registerComponent('target-tracker', {
+      init: function() {
+        const statusDiv = document.getElementById('status');
+        
+        this.el.addEventListener('targetFound', () => {
+          console.log('Marcador detectado!');
+          statusDiv.textContent = '✓ Marcador detectado';
+          statusDiv.style.display = 'block';
+          statusDiv.classList.add('detected');
+          statusDiv.classList.remove('lost');
+          
+          setTimeout(() => {
+            statusDiv.style.display = 'none';
+          }, 2000);
+        });
+        
+        this.el.addEventListener('targetLost', () => {
+          console.log('Marcador perdido!');
+          statusDiv.textContent = '✗ Marcador perdido';
+          statusDiv.classList.add('lost');
+          statusDiv.classList.remove('detected');
+          statusDiv.style.display = 'block';
+          
+          setTimeout(() => {
+            statusDiv.style.display = 'none';
+          }, 2000);
         });
       }
     });
@@ -60,38 +191,51 @@
 </head>
 
 <body>
-  <div id="tap-to-interact">Toque no Objeto 3D para Interagir!</div>
-
+  <!-- Instruções na tela -->
+  <div id="instructions">
+    <h3>📱 Projeto de Realidade Aumentada</h3>
+    <p>Aponte a câmera para o marcador</p>
+    <p>Toque no objeto 3D para mudar cor e tamanho</p>
+  </div>
+  
+  <!-- Status de detecção -->
+  <div id="status"></div>
+  
+  <!-- Cena A-Frame com MindAR -->
   <a-scene 
-    mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/card.mind;" 
+    mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/card.mind; filterMinCF: 0.0001; filterBeta: 0.001;" 
     color-space="sRGB" 
-    renderer="colorManagement: true, physicallyCorrectLights: true" 
+    renderer="colorManagement: true; physicallyCorrectLights: true; antialias: true;" 
     vr-mode-ui="enabled: false" 
     device-orientation-permission-ui="enabled: false">
-
+    
+    <!-- Assets -->
     <a-assets>
       <a-asset-item 
         id="avatarModel" 
         src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/softmind/scene.gltf">
       </a-asset-item>
     </a-assets>
-
+    
+    <!-- Câmera -->
     <a-camera mindar-image-camera=""></a-camera>
-
-    <a-entity mindar-image-target="targetIndex: 0">
+    
+    <!-- Entidade com marcador -->
+    <a-entity mindar-image-target="targetIndex: 0" target-tracker>
+      <!-- Modelo 3D -->
       <a-gltf-model 
-        id="animatedModel"
+        id="model3d"
         src="#avatarModel" 
-        rotation="0 0 0" 
-        position="0 0 0.05"
-        scale="0.08 0.08 0.08"
-        
-        animation__auto="property: rotation; to: 0 360 0; loop: true; dur: 5000; dir: normal; easing: linear;"
-        
-        interact-on-click
-        visible="false"
-        >
-      </a-gltf-model>
+        position="0 0 0"
+        rotation="0 0 0"
+        scale="0.18 0.18 0.18"
+        click-interaction
+        animation-mixer="clip: *"
+        material="emissive: #ffffff; emissiveIntensity: 0.3;"
+      ></a-gltf-model>
+      
+      <!-- Luz adicional para melhor visualização -->
+      <a-light type="point" intensity="0.8" distance="3" color="#ffffff" position="0 0.5 0"></a-light>
     </a-entity>
   </a-scene>
 </body>
